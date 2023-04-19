@@ -4,7 +4,7 @@
 
 ### 下載專案
 ```
-$ git clone https://github.com/naluwan/fitnessRecord-backend.git
+$ git clone https://github.com/naluwan/fitness-record-backend.git
 ```
 
 ### 安裝依賴
