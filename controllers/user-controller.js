@@ -22,6 +22,8 @@ const userController = {
     }
   },
   signInFail: (err, req, res, next) => {
+    err.status = 401;
+    err.message = req.flash('error_message').toString();
     next(err);
   },
 };
