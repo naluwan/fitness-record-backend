@@ -1,7 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('../config/passport');
 const userController = require('../controllers/user-controller');
 const { errorHandler } = require('../middleware/error-handler');
+
+router.post(
+  '/signin',
+  passport.authenticate('local', { session: false, failWithError: true }),
+  userController.signIn,
+  userController.signInFail,
+);
 
 router.post('/signup', userController.signUp);
 
