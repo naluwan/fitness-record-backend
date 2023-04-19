@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user-controller');
+const { errorHandler } = require('../middleware/error-handler');
 
 router.post('/signup', userController.signUp);
 
-router.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+router.use('/', errorHandler);
 
 module.exports = router;
