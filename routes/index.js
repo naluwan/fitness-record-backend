@@ -5,10 +5,12 @@ const passport = require('../config/passport');
 const userController = require('../controllers/user-controller');
 const recordController = require('../controllers/record-controller');
 
+const record = require('./modules/record');
+
 const { errorHandler } = require('../middleware/error-handler');
 const { authenticated } = require('../middleware/auth');
 
-router.get('/records', authenticated, recordController.getRecords);
+router.use(record);
 
 router.post(
   '/signin',
