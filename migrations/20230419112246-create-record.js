@@ -12,10 +12,10 @@ module.exports = {
         type: Sequelize.DATE,
       },
       weight: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       waistline: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       description: {
         type: Sequelize.TEXT,

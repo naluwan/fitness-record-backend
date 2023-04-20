@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
   Record.init(
     {
       date: DataTypes.DATE,
-      weight: DataTypes.INTEGER,
-      waistline: DataTypes.INTEGER,
+      weight: DataTypes.FLOAT,
+      waistline: DataTypes.FLOAT,
       description: DataTypes.TEXT,
     },
     {
