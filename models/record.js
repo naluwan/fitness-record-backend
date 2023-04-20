@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
       // 設定關聯
       // 一個紀錄資料只屬於一個運動分類
       Record.belongsTo(models.SportCategory, { foreignKey: 'sportCategoryId' });
+
+      Record.belongsTo(models.User, { foreignKey: 'userId' });
     }
   }
   Record.init(
