@@ -34,7 +34,6 @@ const recordServices = {
       .catch((err) => cb(err));
   },
   postRecord: (req, cb) => {
-    console.log('user ===> ', req.user);
     const userId = req.user.id;
     const { date, weight, waistline, description, sportCategoryId } = req.body;
     if (!date || !weight) throw new Error('日期、體重為必填欄位');
@@ -50,6 +49,31 @@ const recordServices = {
       .then((createRecord) => {
         cb(null, { record: createRecord });
       })
+      .catch((err) => cb(err));
+  },
+  editRecord: (req, cb) => {
+    Record.findByPk(req.params.id, { raw: true })
+      .then((record) => {
+        if (!record) throw new Error('查無此紀錄');
+        return cb(null, record);
+      })
+      .catch((err) => cb(err));
+  },
+  putRecord: (req, cb) => {
+    const { date, weight, waistline, description, sportCategoryId } = req.body;
+    if (!date || !weight) throw new Error('日期、體重為必填欄位');
+    Record.findByPk(req.params.id)
+      .then((record) => {
+        if (!record) throw new Error('查無此紀錄');
+        return record.update({
+          date,
+          weight,
+          waistline,
+          description,
+          sportCategoryId,
+        });
+      })
+      .then((updateRecord) => cb(null, { record: updateRecord }))
       .catch((err) => cb(err));
   },
 };

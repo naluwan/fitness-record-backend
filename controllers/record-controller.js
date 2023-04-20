@@ -10,6 +10,16 @@ const recordController = {
       err ? next(err) : res.json({ status: 'success', data });
     });
   },
+  editRecord: (req, res, next) => {
+    recordServices.editRecord(req, (err, data) => {
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
+  putRecord: (req, res, next) => {
+    recordServices.putRecord(req, (err, data) => {
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
 };
 
 module.exports = recordController;
