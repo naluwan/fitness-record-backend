@@ -19,10 +19,13 @@ const recordServices = {
       SportCategory.findAll({ raw: true }),
     ])
       .then(([records, sportCategories]) => {
-        const data = records.rows.map((r) => ({
-          ...r,
-          description: r.description.substring(0, 50),
-        }));
+        const data = records.rows.map((r) => {
+          delete r.User.password;
+          return {
+            ...r,
+            description: r.description.substring(0, 50),
+          };
+        });
 
         return cb(null, {
           records: data,
@@ -36,7 +39,7 @@ const recordServices = {
   postRecord: (req, cb) => {
     const userId = req.user.id;
     const { date, weight, waistline, description, sportCategoryId } = req.body;
-    if (!date || !weight) throw new Error('日期、體重為必填欄位');
+    if (!date || !weight || !sportCategoryId) throw new Error('日期、體重和運動類型為必填欄位');
 
     return Record.create({
       date,
@@ -47,15 +50,31 @@ const recordServices = {
       userId,
     })
       .then((createRecord) => {
-        cb(null, { record: createRecord });
+        return Record.findByPk(createRecord.id, {
+          include: [SportCategory, User],
+          nest: true,
+          raw: true,
+        });
+      })
+      .then((record) => {
+        delete record.User.password;
+        return cb(null, record);
       })
       .catch((err) => cb(err));
   },
   editRecord: (req, cb) => {
-    Record.findByPk(req.params.id, { raw: true })
-      .then((record) => {
+    Promise.all([
+      Record.findByPk(req.params.id, {
+        include: [SportCategory, User],
+        nest: true,
+        raw: true,
+      }),
+      SportCategory.findAll({ raw: true }),
+    ])
+      .then(([record, sportCategories]) => {
         if (!record) throw new Error('查無此紀錄');
-        return cb(null, record);
+        delete record.User.password;
+        return cb(null, { record, sportCategories });
       })
       .catch((err) => cb(err));
   },
@@ -73,7 +92,17 @@ const recordServices = {
           sportCategoryId,
         });
       })
-      .then((updateRecord) => cb(null, { record: updateRecord }))
+      .then((updateRecord) => {
+        return Record.findByPk(updateRecord.id, {
+          include: [SportCategory, User],
+          nest: true,
+          raw: true,
+        });
+      })
+      .then((record) => {
+        delete record.User.password;
+        return cb(null, record);
+      })
       .catch((err) => cb(err));
   },
   deleteRecord: (req, cb) => {
