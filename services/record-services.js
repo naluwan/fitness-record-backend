@@ -2,6 +2,7 @@ const { Record, SportCategory, User } = require('../models');
 
 const recordServices = {
   getRecords: (req, cb) => {
+    const userId = Number(req.query.userId) || '';
     const sportCategoryId = Number(req.query.sportCategoryId) || '';
 
     Promise.all([
@@ -9,9 +10,11 @@ const recordServices = {
         include: [SportCategory, User],
         where: {
           ...(sportCategoryId ? { sportCategoryId } : {}),
+          ...(userId ? { userId } : {}),
         },
         nest: true,
         raw: true,
+        order: [['date', 'DESC']],
       }),
       SportCategory.findAll({ raw: true }),
     ])
@@ -25,6 +28,7 @@ const recordServices = {
           records: data,
           sportCategories,
           sportCategoryId,
+          userId,
         });
       })
       .catch((err) => cb(err));
