@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Record.init(
     {
-      date: DataTypes.STRING,
+      date: DataTypes.DATE,
       weight: DataTypes.INTEGER,
       waistline: DataTypes.INTEGER,
       description: DataTypes.TEXT,
