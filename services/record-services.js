@@ -76,6 +76,15 @@ const recordServices = {
       .then((updateRecord) => cb(null, { record: updateRecord }))
       .catch((err) => cb(err));
   },
+  deleteRecord: (req, cb) => {
+    return Record.findByPk(req.params.id)
+      .then((record) => {
+        if (!record) throw new Error('查無此紀錄');
+        return record.destroy();
+      })
+      .then((deleteRecord) => cb(null, { record: deleteRecord }))
+      .catch((err) => cb(err));
+  },
 };
 
 module.exports = recordServices;

@@ -20,6 +20,11 @@ const recordController = {
       err ? next(err) : res.json({ status: 'success', data });
     });
   },
+  deleteRecord: (req, res, next) => {
+    recordServices.deleteRecord(req, (err, data) => {
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
 };
 
 module.exports = recordController;
