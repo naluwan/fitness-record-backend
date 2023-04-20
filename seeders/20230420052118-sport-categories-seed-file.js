@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert(
       'SportCategories',
-      ['跑步', '跳繩', '籃球', '游泳', '重訓'].map((item) => {
+      ['休息', '跑步', '跳繩', '籃球', '游泳', '重訓'].map((item) => {
         return {
           name: item,
           created_at: new Date(),
