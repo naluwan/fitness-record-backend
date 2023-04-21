@@ -58,7 +58,7 @@ const recordServices = {
       })
       .then((record) => {
         delete record.User.password;
-        return cb(null, record);
+        return cb(null, { record });
       })
       .catch((err) => cb(err));
   },
@@ -101,7 +101,7 @@ const recordServices = {
       })
       .then((record) => {
         delete record.User.password;
-        return cb(null, record);
+        return cb(null, { record });
       })
       .catch((err) => cb(err));
   },
