@@ -28,4 +28,6 @@ fitnessRecord app listening on http://localhost:3000
 ```
 http://localhost:3000
 ```
-
+## API Document
+[API文檔連結](https://rectangular-hearing-4e1.notion.site/fitness-record-API-Document-dfea2a334b3b43f3b6a10a34b15e9e23
+)
