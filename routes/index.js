@@ -20,6 +20,7 @@ router.post(
 );
 
 router.post('/signup', userController.signUp);
+router.get('/auth', authenticated, userController.auth);
 
 router.use('/', errorHandler);
 
