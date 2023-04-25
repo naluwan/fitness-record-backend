@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { User } = require('../models');
+const { imgurFileHandler } = require('../helpers/file-helpers');
 
 const userServices = {
   signUp: (req, cb) => {
@@ -12,16 +13,20 @@ const userServices = {
       throw new Error('密碼與確認密碼不相符');
     }
 
+    const { file } = req;
     return User.findOne({ where: { email } })
       .then((user) => {
         if (user) throw new Error('此帳號已註冊過');
         return bcrypt.hash(password, 10);
       })
       .then((hash) => {
-        return User.create({
-          name,
-          email,
-          password: hash,
+        return imgurFileHandler(file).then((filePath) => {
+          return User.create({
+            name,
+            email,
+            password: hash,
+            avatar: filePath || 'https://i.imgur.com/PGbAlS3.png',
+          });
         });
       })
       .then((createUser) => {

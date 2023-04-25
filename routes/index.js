@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('../config/passport');
+const upload = require('../middleware/multer');
 
 const userController = require('../controllers/user-controller');
 const recordController = require('../controllers/record-controller');
@@ -19,7 +20,7 @@ router.post(
   userController.signInFail,
 );
 
-router.post('/signup', userController.signUp);
+router.post('/signup', upload.single('avatar'), userController.signUp);
 router.get('/auth', authenticated, userController.auth);
 
 router.use('/', errorHandler);
