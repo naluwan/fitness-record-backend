@@ -1,4 +1,5 @@
 const { Record, SportCategory, User } = require('../models');
+const { dateFormat } = require('../helpers/date-helpers');
 
 const recordServices = {
   getRecords: (req, cb) => {
@@ -23,6 +24,7 @@ const recordServices = {
           delete r.User.password;
           return {
             ...r,
+            date: dateFormat(r.date),
             description: r.description.substring(0, 50),
           };
         });
