@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       avatar: DataTypes.STRING,
+      weight: DataTypes.FLOAT,
+      waistline: DataTypes.FLOAT,
+      nowWeight: DataTypes.FLOAT,
+      nowWaistline: DataTypes.FLOAT,
+      weightDiff: DataTypes.FLOAT,
+      waistlineDiff: DataTypes.FLOAT,
     },
     {
       sequelize,
