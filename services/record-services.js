@@ -15,7 +15,10 @@ const recordServices = {
         },
         nest: true,
         raw: true,
-        order: [['date', 'DESC']],
+        order: [
+          ['date', 'DESC'],
+          ['id', 'DESC'],
+        ],
       }),
       SportCategory.findAll({ raw: true }),
     ])
