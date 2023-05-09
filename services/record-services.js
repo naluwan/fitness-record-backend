@@ -46,15 +46,37 @@ const recordServices = {
     const { date, weight, waistline, description, sportCategoryId } = req.body;
     if (!date || !weight || !sportCategoryId) throw new Error('日期、體重和運動類型為必填欄位');
 
-    return Record.create({
+    return User.findByPk(userId)
+      .then((user) => {
+        if (!user) throw new Error('查無使用者，請重新嘗試');
+        if (user.weight === null) throw new Error('請先至個人檔案設定目前體重，再進行新增記錄');
+        if (user.waistline === null && waistline)
+          throw new Error('請先至個人檔案設定目前腰圍，再進行新增記錄');
+
+        const weightDiff = Number(((weight / user.weight - 1) * 100).toFixed(2));
+        let waistlineDiff = 0;
+        if (user.waistline !== null && waistline) {
+          waistlineDiff = Number(((waistline / user.waistline - 1) * 100).toFixed(2));
+        }
+
+        return Promise.all([
+          Record.create({
       date,
       weight,
       waistline,
       description,
       sportCategoryId,
       userId,
+          }),
+          user.update({
+            nowWeight: weight,
+            nowWaistline: waistline,
+            weightDiff,
+            waistlineDiff,
+          }),
+        ]);
     })
-      .then((createRecord) => {
+      .then(([createRecord, updateUser]) => {
         return Record.findByPk(createRecord.id, {
           include: [SportCategory, User],
           nest: true,
