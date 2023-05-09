@@ -61,12 +61,12 @@ const recordServices = {
 
         return Promise.all([
           Record.create({
-      date,
-      weight,
-      waistline,
-      description,
-      sportCategoryId,
-      userId,
+            date,
+            weight,
+            waistline,
+            description,
+            sportCategoryId,
+            userId,
           }),
           user.update({
             nowWeight: weight,
@@ -75,7 +75,7 @@ const recordServices = {
             waistlineDiff,
           }),
         ]);
-    })
+      })
       .then(([createRecord, updateUser]) => {
         return Record.findByPk(createRecord.id, {
           include: [SportCategory, User],
@@ -108,18 +108,61 @@ const recordServices = {
   putRecord: (req, cb) => {
     const { date, weight, waistline, description, sportCategoryId } = req.body;
     if (!date || !weight) throw new Error('日期、體重為必填欄位');
-    Record.findByPk(req.params.id)
+    return Record.findByPk(req.params.id)
       .then((record) => {
         if (!record) throw new Error('查無此紀錄');
-        return record.update({
-          date,
-          weight,
-          waistline,
-          description,
-          sportCategoryId,
+
+        return Record.findAll({ where: { userId: record.userId } }).then((allRecords) => {
+          const lastPostDate = Math.max(
+            ...allRecords.map((recordItem) => new Date(recordItem.date).getTime()),
+          );
+
+          return User.findByPk(record.userId).then((user) => {
+            if (!user) throw new Error('查無使用者，請重新嘗試');
+            if (user.weight === null) throw new Error('請先至個人檔案設定目前體重，再進行新增記錄');
+            if (user.waistline === null && waistline)
+              throw new Error('請先至個人檔案設定目前腰圍，再進行新增記錄');
+
+            const weightDiff = Number(((weight / user.weight - 1) * 100).toFixed(2));
+            let waistlineDiff = 0;
+            if (user.waistline !== null && waistline) {
+              waistlineDiff = Number(((waistline / user.waistline - 1) * 100).toFixed(2));
+            }
+
+            if (lastPostDate <= new Date(date).getTime()) {
+              return Promise.all([
+                record.update({
+                  date,
+                  weight,
+                  waistline,
+                  description,
+                  sportCategoryId,
+                }),
+                User.findByPk(record.userId).then((user) => {
+                  return user.update({
+                    nowWeight: weight,
+                    nowWaistline: waistline,
+                    weightDiff,
+                    waistlineDiff,
+                  });
+                }),
+              ]);
+            } else {
+              return Promise.all([
+                record.update({
+                  date,
+                  weight,
+                  waistline,
+                  description,
+                  sportCategoryId,
+                }),
+                User.findByPk(record.userId),
+              ]);
+            }
+          });
         });
       })
-      .then((updateRecord) => {
+      .then(([updateRecord, updateUser]) => {
         return Record.findByPk(updateRecord.id, {
           include: [SportCategory, User],
           nest: true,
