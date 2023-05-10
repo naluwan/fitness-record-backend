@@ -63,28 +63,28 @@ const recordServices = {
 
           // 如果新記錄的日期是最後一篇貼文的日期或大於最後一篇貼文的日期，則更新使用者資訊的體重與腰圍
           if (lastPostDate <= new Date(date).getTime()) {
-        // 計算預設體重和腰圍與目前體重和腰圍的差異百分比
-        const weightDiff = Number(((weight / user.weight - 1) * 100).toFixed(2));
-        let waistlineDiff = 0;
-        if (user.waistline !== null && waistline) {
-          waistlineDiff = Number(((waistline / user.waistline - 1) * 100).toFixed(2));
-        }
+            // 計算預設體重和腰圍與目前體重和腰圍的差異百分比
+            const weightDiff = Number(((weight / user.weight - 1) * 100).toFixed(2));
+            let waistlineDiff = 0;
+            if (user.waistline !== null && waistline) {
+              waistlineDiff = Number(((waistline / user.waistline - 1) * 100).toFixed(2));
+            }
 
-        return Promise.all([
-          Record.create({
-            date,
-            weight,
-            waistline,
-            description,
-            sportCategoryId,
-            userId,
-          }),
-          user.update({
-            nowWeight: weight,
-            nowWaistline: waistline,
-            weightDiff,
-            waistlineDiff,
-          }),
+            return Promise.all([
+              Record.create({
+                date,
+                weight,
+                waistline,
+                description,
+                sportCategoryId,
+                userId,
+              }),
+              user.update({
+                nowWeight: weight,
+                nowWaistline: waistline,
+                weightDiff,
+                waistlineDiff,
+              }),
             ])
               .then(([createRecord, updateUser]) => {
                 return Record.findByPk(createRecord.id, {
@@ -106,17 +106,17 @@ const recordServices = {
               description,
               sportCategoryId,
               userId,
-      })
+            })
               .then((createRecord) => {
-        return Record.findByPk(createRecord.id, {
-          include: [SportCategory, User],
-          nest: true,
-          raw: true,
-        });
-      })
-      .then((record) => {
-        delete record.User.password;
-        return cb(null, { record });
+                return Record.findByPk(createRecord.id, {
+                  include: [SportCategory, User],
+                  nest: true,
+                  raw: true,
+                });
+              })
+              .then((record) => {
+                delete record.User.password;
+                return cb(null, { record });
               });
           }
         });
@@ -251,7 +251,43 @@ const recordServices = {
         if (!record) throw new Error('查無此紀錄');
         return record.destroy();
       })
-      .then((deleteRecord) => cb(null, { record: deleteRecord }))
+      .then((deleteRecord) => {
+        // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
+        return Record.findAll({ where: { userId: deleteRecord.userId } }).then((allRecords) => {
+          const lastPostDate = Math.max(
+            ...allRecords.map((recordItem) => new Date(recordItem.date).getTime()),
+          );
+
+          return Record.findAll({
+            where: { date: new Date(lastPostDate) },
+            nest: true,
+            raw: true,
+            order: [['id', 'DESC']],
+          })
+            .then((records) => {
+              // 最後一篇貼文可能會有好幾篇，所以使用除了查詢日期外，再使用id做排序，id越大代表越新
+              const lastRecord = records[0];
+              return User.findByPk(lastRecord.userId).then((user) => {
+                const weightDiff = Number(((lastRecord.weight / user.weight - 1) * 100).toFixed(2));
+                let waistlineDiff = 0;
+                if (user.waistline !== null && lastRecord.waistline) {
+                  waistlineDiff = Number(
+                    ((lastRecord.waistline / user.waistline - 1) * 100).toFixed(2),
+                  );
+                }
+
+                // 使用該使用者的最後一篇紀錄來更新使用者資訊
+                return user.update({
+                  nowWeight: lastRecord.weight,
+                  nowWaistline: lastRecord.waistline,
+                  weightDiff,
+                  waistlineDiff,
+                });
+              });
+            })
+            .then(() => cb(null, { deleteRecord }));
+        });
+      })
       .catch((err) => cb(err));
   },
 };
