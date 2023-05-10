@@ -254,35 +254,50 @@ const recordServices = {
       .then((deleteRecord) => {
         // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
         return Record.findAll({ where: { userId: deleteRecord.userId } }).then((allRecords) => {
-          const lastPostDate = Math.max(
-            ...allRecords.map((recordItem) => new Date(recordItem.date).getTime()),
-          );
+          // 驗證該使用者是否還有貼文
+          if (allRecords.length > 0) {
+            const lastPostDate = Math.max(
+              ...allRecords.map((recordItem) => new Date(recordItem.date).getTime()),
+            );
 
-          return Record.findAll({
+            return Record.findAll({
               where: { date: new Date(lastPostDate), userId: deleteRecord.userId },
-            nest: true,
-            raw: true,
-            order: [['id', 'DESC']],
-          })
-            .then((records) => {
-              // 最後一篇貼文可能會有好幾篇，所以使用除了查詢日期外，再使用id做排序，id越大代表越新
-              const lastRecord = records[0];
-              return User.findByPk(lastRecord.userId).then((user) => {
-                const weightDiff = Number(((lastRecord.weight / user.weight - 1) * 100).toFixed(2));
-                let waistlineDiff = 0;
-                if (user.waistline !== null && lastRecord.waistline) {
-                  waistlineDiff = Number(
-                    ((lastRecord.waistline / user.waistline - 1) * 100).toFixed(2),
+              nest: true,
+              raw: true,
+              order: [['id', 'DESC']],
+            })
+              .then((records) => {
+                // 最後一篇貼文可能會有好幾篇，所以使用除了查詢日期外，再使用id做排序，id越大代表越新
+                const lastRecord = records[0];
+                return User.findByPk(lastRecord.userId).then((user) => {
+                  const weightDiff = Number(
+                    ((lastRecord.weight / user.weight - 1) * 100).toFixed(2),
                   );
-                }
+                  let waistlineDiff = 0;
+                  if (user.waistline !== null && lastRecord.waistline) {
+                    waistlineDiff = Number(
+                      ((lastRecord.waistline / user.waistline - 1) * 100).toFixed(2),
+                    );
+                  }
 
-                // 使用該使用者的最後一篇紀錄來更新使用者資訊
-                return user.update({
-                  nowWeight: lastRecord.weight,
-                  nowWaistline: lastRecord.waistline,
-                  weightDiff,
-                  waistlineDiff,
+                  // 使用該使用者的最後一篇紀錄來更新使用者資訊
+                  return user.update({
+                    nowWeight: lastRecord.weight,
+                    nowWaistline: lastRecord.waistline,
+                    weightDiff,
+                    waistlineDiff,
+                  });
                 });
+              })
+              .then(() => cb(null, { deleteRecord }));
+          }
+          return User.findByPk(deleteRecord.userId)
+            .then((user) => {
+              return user.update({
+                nowWeight: null,
+                nowWaistline: null,
+                weightDiff: null,
+                waistlineDiff: null,
               });
             })
             .then(() => cb(null, { deleteRecord }));
