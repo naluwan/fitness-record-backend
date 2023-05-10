@@ -55,6 +55,14 @@ const recordServices = {
         if (user.waistline === null && waistline)
           throw new Error('請先至個人檔案設定目前腰圍，再進行新增記錄');
 
+        // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
+        return Record.findAll({ where: { userId } }).then((allRecords) => {
+          const lastPostDate = Math.max(
+            ...allRecords.map((recordItem) => new Date(recordItem.date).getTime()),
+          );
+
+          // 如果新記錄的日期是最後一篇貼文的日期或大於最後一篇貼文的日期，則更新使用者資訊的體重與腰圍
+          if (lastPostDate <= new Date(date).getTime()) {
         // 計算預設體重和腰圍與目前體重和腰圍的差異百分比
         const weightDiff = Number(((weight / user.weight - 1) * 100).toFixed(2));
         let waistlineDiff = 0;
@@ -77,9 +85,29 @@ const recordServices = {
             weightDiff,
             waistlineDiff,
           }),
-        ]);
+            ])
+              .then(([createRecord, updateUser]) => {
+                return Record.findByPk(createRecord.id, {
+                  include: [SportCategory, User],
+                  nest: true,
+                  raw: true,
+                });
+              })
+              .then((record) => {
+                delete record.User.password;
+                return cb(null, { record });
+              });
+          } else {
+            // 新記錄的日期小於最後一篇貼文的日期，代表是補之前的記錄，僅需要新增記錄不需要更新使用者資訊
+            return Record.create({
+              date,
+              weight,
+              waistline,
+              description,
+              sportCategoryId,
+              userId,
       })
-      .then(([createRecord, updateUser]) => {
+              .then((createRecord) => {
         return Record.findByPk(createRecord.id, {
           include: [SportCategory, User],
           nest: true,
@@ -89,6 +117,9 @@ const recordServices = {
       .then((record) => {
         delete record.User.password;
         return cb(null, { record });
+              });
+          }
+        });
       })
       .catch((err) => cb(err));
   },
