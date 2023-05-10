@@ -259,7 +259,7 @@ const recordServices = {
           );
 
           return Record.findAll({
-            where: { date: new Date(lastPostDate) },
+              where: { date: new Date(lastPostDate), userId: deleteRecord.userId },
             nest: true,
             raw: true,
             order: [['id', 'DESC']],
