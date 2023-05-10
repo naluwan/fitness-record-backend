@@ -75,6 +75,38 @@ module.exports = {
         sport_category_id: 1,
         user_id: 2,
       },
+      {
+        date: '2023-04-17',
+        weight: 8,
+        waistline: 5,
+        description: '剛開始會爬',
+        sport_category_id: 2,
+        user_id: 3,
+      },
+      {
+        date: '2023-04-18',
+        weight: 8.2,
+        waistline: 5,
+        description: '拔拔在澡盆讓我游泳',
+        sport_category_id: 5,
+        user_id: 3,
+      },
+      {
+        date: '2023-04-19',
+        weight: 8.2,
+        waistline: 5.1,
+        description: '休息一下～～',
+        sport_category_id: 1,
+        user_id: 3,
+      },
+      {
+        date: '2023-04-25',
+        weight: 8.3,
+        waistline: 5.2,
+        description: '我會扶站和扶走了！！！',
+        sport_category_id: 2,
+        user_id: 3,
+      },
     ];
     await queryInterface.bulkInsert(
       'Records',
