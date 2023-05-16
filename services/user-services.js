@@ -4,7 +4,8 @@ const { imgurFileHandler } = require('../helpers/file-helpers');
 
 const userServices = {
   signUp: (req, cb) => {
-    const { name, email, password, passwordCheck } = req.body;
+    const { name, email, password, passwordCheck, weight, waistline } = req.body;
+    console.log('body ===> ', req.body);
     if (!name || !email || !password || !passwordCheck) {
       throw new Error('所有欄位都是必填的');
     }
@@ -14,6 +15,7 @@ const userServices = {
     }
 
     const { file } = req;
+
     return User.findOne({ where: { email } })
       .then((user) => {
         if (user) throw new Error('此帳號已註冊過');
@@ -24,6 +26,8 @@ const userServices = {
           return User.create({
             name,
             email,
+            weight,
+            waistline,
             password: hash,
             avatar: filePath || 'https://i.imgur.com/PGbAlS3.png',
           });
