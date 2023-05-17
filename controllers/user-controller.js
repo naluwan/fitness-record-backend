@@ -26,7 +26,7 @@ const userController = {
     err.message = req.flash('error_message').toString();
     next(err);
   },
-  auth: (err, req, res, next) => {
+  auth: (req, res, next) => {
     const user = req.user;
     res.json({ status: 'success', data: { user } });
   },

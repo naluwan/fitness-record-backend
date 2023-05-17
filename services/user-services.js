@@ -5,7 +5,7 @@ const { imgurFileHandler } = require('../helpers/file-helpers');
 const userServices = {
   signUp: (req, cb) => {
     const { name, email, password, passwordCheck, weight, waistline } = req.body;
-    console.log('body ===> ', req.body);
+
     if (!name || !email || !password || !passwordCheck) {
       throw new Error('所有欄位都是必填的');
     }
