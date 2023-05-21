@@ -28,6 +28,15 @@ module.exports = {
         weight: 8,
         waistline: 5,
       },
+      {
+        name: 'kobe',
+        email: 'kobe@example.com',
+        password: await bcrypt.hash('test1234', 10),
+        avatar:
+          'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.18169-9/13177146_10154154195750419_4907503626014205768_n.jpg?_nc_cat=1&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=gwkFl-F0UvkAX9SzFA5&_nc_ht=scontent-tpe1-1.xx&oh=00_AfAUR0uET6dVtuO4tdoLSZScdXdw_IXVR1RKv3XDHKH5UA&oe=64855F6B',
+        weight: 100,
+        waistline: 90,
+      },
     ];
 
     await queryInterface.bulkInsert(

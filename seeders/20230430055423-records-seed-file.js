@@ -107,6 +107,30 @@ module.exports = {
         sport_category_id: 2,
         user_id: 3,
       },
+      {
+        date: '2023-04-26',
+        weight: 94,
+        waistline: 85,
+        description: '慢跑1小時',
+        sport_category_id: 2,
+        user_id: 4,
+      },
+      {
+        date: '2023-04-25',
+        weight: 95,
+        waistline: 87,
+        description: '游泳3km',
+        sport_category_id: 5,
+        user_id: 4,
+      },
+      {
+        date: '2023-04-20',
+        weight: 97,
+        waistline: 89,
+        description: '跳繩 x 2500',
+        sport_category_id: 3,
+        user_id: 4,
+      },
     ];
     await queryInterface.bulkInsert(
       'Records',
