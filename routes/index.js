@@ -7,11 +7,13 @@ const userController = require('../controllers/user-controller');
 const recordController = require('../controllers/record-controller');
 
 const record = require('./modules/record');
+const rank = require('./modules/rank');
 
 const { errorHandler } = require('../middleware/error-handler');
 const { authenticated } = require('../middleware/auth');
 
 router.use('/records', record);
+router.use('/rank', rank);
 
 router.post(
   '/signin',
