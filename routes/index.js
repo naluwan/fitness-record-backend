@@ -11,7 +11,7 @@ const record = require('./modules/record');
 const { errorHandler } = require('../middleware/error-handler');
 const { authenticated } = require('../middleware/auth');
 
-router.use(record);
+router.use('/records', record);
 
 router.post(
   '/signin',
