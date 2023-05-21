@@ -16,7 +16,26 @@ const rankServices = {
         // 去除使用者敏感資訊
         currentRankUsers.forEach((user) => delete user.password);
 
-        cb(null, { weightRankUsers: currentRankUsers });
+        cb(null, { users: currentRankUsers });
+      })
+      .catch((err) => cb(err));
+  },
+  waistlineRank: (req, cb) => {
+    User.findAll({
+      nest: true,
+      raw: true,
+      order: [['waistlineDiff', 'ASC']],
+    })
+      .then((waistlineRankUsers) => {
+        // 將體重差異做升冪排列，去除null的值並取前三名
+        const currentRankUsers = waistlineRankUsers
+          .filter((user) => user.waistlineDiff !== null)
+          .slice(0, 3);
+
+        // 去除使用者敏感資訊
+        currentRankUsers.forEach((user) => delete user.password);
+
+        cb(null, { users: currentRankUsers });
       })
       .catch((err) => cb(err));
   },

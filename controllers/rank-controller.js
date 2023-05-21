@@ -6,6 +6,11 @@ const rankController = {
       err ? next(err) : res.json({ status: 'success', data });
     });
   },
+  waistlineRank: (req, res, next) => {
+    rankServices.waistlineRank(req, (err, data) => {
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
 };
 
 module.exports = rankController;
