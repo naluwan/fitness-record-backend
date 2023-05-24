@@ -142,6 +142,7 @@ const recordServices = {
   putRecord: (req, cb) => {
     const { date, weight, waistline, description, sportCategoryId } = req.body;
     if (!date || !weight || !sportCategoryId) throw new Error('日期、體重和運動類型為必填欄位');
+    if (weight === 0 || waistline === 0) throw new Error('體重和腰圍不可為0');
     return Record.findByPk(req.params.id)
       .then((record) => {
         if (!record) throw new Error('查無此紀錄');
