@@ -1,5 +1,4 @@
 const { Record, SportCategory, User, Image } = require('../models');
-const { dateFormat } = require('../helpers/date-helpers');
 
 const recordServices = {
   getRecords: (req, cb) => {
