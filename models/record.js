@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       weight: DataTypes.FLOAT,
       waistline: DataTypes.FLOAT,
       description: DataTypes.TEXT,
+      images: DataTypes.STRING,
     },
     {
       sequelize,
