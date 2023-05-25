@@ -2,7 +2,11 @@ const { recordServices } = require('../services');
 const recordController = {
   getRecords: (req, res, next) => {
     recordServices.getRecords(req, (err, data) => {
-      err ? next(err) : res.json({ status: 'success', data });
+      // 刪除使用者敏感資料
+      data.records.rows.forEach((r) => {
+        delete r.User.dataValues.password;
+      });
+      err ? next(err) : res.json({ status: 'success', data: { records: data.records.rows } });
     });
   },
   postRecord: (req, res, next) => {

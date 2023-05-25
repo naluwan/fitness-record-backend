@@ -1,4 +1,4 @@
-const { Record, SportCategory, User } = require('../models');
+const { Record, SportCategory, User, Image } = require('../models');
 const { dateFormat } = require('../helpers/date-helpers');
 
 const recordServices = {
@@ -8,13 +8,11 @@ const recordServices = {
 
     Promise.all([
       Record.findAndCountAll({
-        include: [SportCategory, User],
+        include: [SportCategory, User, Image],
         where: {
           ...(sportCategoryId ? { sportCategoryId } : {}),
           ...(userId ? { userId } : {}),
         },
-        nest: true,
-        raw: true,
         order: [
           ['date', 'DESC'],
           ['id', 'DESC'],
@@ -23,17 +21,8 @@ const recordServices = {
       SportCategory.findAll({ raw: true }),
     ])
       .then(([records, sportCategories]) => {
-        const data = records.rows.map((r) => {
-          delete r.User.password;
-          return {
-            ...r,
-            date: dateFormat(r.date),
-            description: r.description.substring(0, 50),
-          };
-        });
-
         return cb(null, {
-          records: data,
+          records,
           sportCategories,
           sportCategoryId,
           userId,
@@ -88,7 +77,7 @@ const recordServices = {
             ])
               .then(([createRecord, updateUser]) => {
                 return Record.findByPk(createRecord.id, {
-                  include: [SportCategory, User],
+                  include: [SportCategory, User, Image],
                   nest: true,
                   raw: true,
                 });
@@ -109,7 +98,7 @@ const recordServices = {
             })
               .then((createRecord) => {
                 return Record.findByPk(createRecord.id, {
-                  include: [SportCategory, User],
+                  include: [SportCategory, User, Image],
                   nest: true,
                   raw: true,
                 });
@@ -126,9 +115,7 @@ const recordServices = {
   editRecord: (req, cb) => {
     Promise.all([
       Record.findByPk(req.params.id, {
-        include: [SportCategory, User],
-        nest: true,
-        raw: true,
+        include: [SportCategory, User, Image],
       }),
       SportCategory.findAll({ raw: true }),
     ])
@@ -233,7 +220,7 @@ const recordServices = {
             })
             .then(([updateRecord, updateUser]) => {
               return Record.findByPk(updateRecord.id, {
-                include: [SportCategory, User],
+                include: [SportCategory, User, Image],
                 nest: true,
                 raw: true,
               });
