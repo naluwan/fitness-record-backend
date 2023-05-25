@@ -93,6 +93,11 @@ module.exports = {
         user_id: 4,
         url: 'https://i.ytimg.com/vi/t_YurKl0ry0/maxresdefault.jpg',
       },
+      {
+        record_id: 16,
+        user_id: 4,
+        url: 'https://pbs.twimg.com/media/FJr1YBEXIAATZUv.png',
+      },
     ];
     await queryInterface.bulkInsert(
       'Images',

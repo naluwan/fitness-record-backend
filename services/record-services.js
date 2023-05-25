@@ -234,13 +234,25 @@ const recordServices = {
       .catch((err) => cb(err));
   },
   deleteRecord: (req, cb) => {
-    return Record.findByPk(req.params.id)
-      .then((record) => {
+    return Promise.all([
+      Record.findByPk(req.params.id),
+      Image.findAll({ where: { recordId: req.params.id } }),
+    ])
+      .then(([record, images]) => {
         if (!record) throw new Error('查無此紀錄');
-        return record.destroy();
+
+        return Promise.all([record.destroy(), images.map((image) => image.destroy())]);
       })
-      .then((deleteRecord) => {
+      .then(([deleteRecord, deleteImages]) => {
         // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
+        let imagesArr = [];
+        deleteImages.forEach((image) =>
+          image.then((imageItem) => {
+            const { recordId, userId, url } = imageItem;
+            imagesArr.push({ recordId, userId, url });
+          }),
+        );
+
         return Record.findAll({ where: { userId: deleteRecord.userId } }).then((allRecords) => {
           // 驗證該使用者是否還有貼文
           if (allRecords.length > 0) {
@@ -277,7 +289,7 @@ const recordServices = {
                   });
                 });
               })
-              .then(() => cb(null, { deleteRecord }));
+              .then(() => cb(null, { deleteRecord, images: imagesArr }));
           }
           return User.findByPk(deleteRecord.userId)
             .then((user) => {
@@ -288,7 +300,7 @@ const recordServices = {
                 waistlineDiff: null,
               });
             })
-            .then(() => cb(null, { deleteRecord }));
+            .then(() => cb(null, { deleteRecord, images: imagesArr }));
         });
       })
       .catch((err) => cb(err));
