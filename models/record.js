@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       Record.belongsTo(models.SportCategory, { foreignKey: 'sportCategoryId' });
 
       Record.belongsTo(models.User, { foreignKey: 'userId' });
+
+      Record.hasMany(models.Image, { foreignKey: 'recordId' });
     }
   }
   Record.init(
@@ -21,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       weight: DataTypes.FLOAT,
       waistline: DataTypes.FLOAT,
       description: DataTypes.TEXT,
-      images: DataTypes.STRING,
     },
     {
       sequelize,
