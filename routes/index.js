@@ -22,6 +22,10 @@ router.post(
   userController.signInFail,
 );
 
+router.get('/login/line', passport.authenticate('line', { scope: ['email', 'profile', 'openid'] }));
+
+router.post('/login/line/return', userController.lineLogin);
+
 router.post('/signup', upload.single('avatar'), userController.signUp);
 router.get('/auth', authenticated, userController.auth);
 
