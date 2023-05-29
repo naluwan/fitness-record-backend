@@ -21,6 +21,20 @@ const userController = {
       next(err);
     }
   },
+  lineLogin: (req, res, next) => {
+    userServices.lineLogin(req, (err, data) => {
+      if (err) next(err);
+      const userData = data.user.dataValues;
+      delete userData.password;
+      const token = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '8h' });
+      res.json({
+        status: 'success',
+        token,
+        idToken: data.idToken,
+        user: userData,
+      });
+    });
+  },
   signInFail: (err, req, res, next) => {
     err.status = 401;
     err.message = req.flash('error_message').toString();
