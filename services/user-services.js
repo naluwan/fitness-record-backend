@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 const { imgurFileHandler } = require('../helpers/file-helpers');
+const jwt = require('jsonwebtoken');
 
 const userServices = {
   signUp: (req, cb) => {
@@ -39,6 +40,31 @@ const userServices = {
         return cb(null, user);
       })
       .catch((err) => cb(err));
+  },
+  lineLogin: (req, cb) => {
+    const { id_token } = req.body;
+    const decodeIdToken = jwt.decode(id_token);
+    const { name, email, picture } = decodeIdToken;
+    return User.findOne({ where: { email } }).then((user) => {
+      if (user) return cb(null, { user, idToken: id_token });
+
+      const randomPassword = Math.random().toString(36).slice(-8);
+      bcrypt
+        .genSalt(10)
+        .then((salt) => bcrypt.hash(randomPassword, salt))
+        .then((hash) =>
+          User.create({
+            name,
+            email,
+            weight: null,
+            waistline: null,
+            password: hash,
+            avatar: picture || 'https://i.imgur.com/PGbAlS3.png',
+          }),
+        )
+        .then((user) => cb(null, { user, idToken: id_token }))
+        .catch((err) => cb(err));
+    });
   },
 };
 
