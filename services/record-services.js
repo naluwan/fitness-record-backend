@@ -5,7 +5,7 @@ const recordServices = {
     const userId = Number(req.query.userId) || '';
     const sportCategoryId = Number(req.query.sportCategoryId) || '';
 
-    Promise.all([
+    return Promise.all([
       Record.findAndCountAll({
         include: [SportCategory, User, Image],
         where: {
@@ -21,6 +21,7 @@ const recordServices = {
       SportCategory.findAll({ raw: true }),
     ])
       .then(([records, sportCategories]) => {
+        console.log('record service records ==> ', records);
         return cb(null, {
           records,
           sportCategories,
@@ -113,7 +114,7 @@ const recordServices = {
       .catch((err) => cb(err));
   },
   editRecord: (req, cb) => {
-    Promise.all([
+    return Promise.all([
       Record.findByPk(req.params.id, {
         include: [SportCategory, User, Image],
       }),

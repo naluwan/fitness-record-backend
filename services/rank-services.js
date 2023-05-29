@@ -2,7 +2,7 @@ const { User } = require('../models');
 
 const rankServices = {
   weightRank: (req, cb) => {
-    User.findAll({
+    return User.findAll({
       nest: true,
       raw: true,
       order: [['weightDiff', 'ASC']],
@@ -21,7 +21,7 @@ const rankServices = {
       .catch((err) => cb(err));
   },
   waistlineRank: (req, cb) => {
-    User.findAll({
+    return User.findAll({
       nest: true,
       raw: true,
       order: [['waistlineDiff', 'ASC']],
