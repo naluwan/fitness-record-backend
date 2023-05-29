@@ -4,13 +4,13 @@ const { dateFormat } = require('../helpers/date-helpers');
 const recordController = {
   getRecords: (req, res, next) => {
     recordServices.getRecords(req, (err, data) => {
+      if (err) return next(err);
       // 刪除使用者敏感資料
-      console.log('record controller ===> ', data);
       data.records.rows.forEach((r) => {
         delete r.User.dataValues.password;
         r.dataValues.date = dateFormat(r.dataValues.date);
       });
-      err ? next(err) : res.json({ status: 'success', data: { records: data.records.rows } });
+      return res.json({ status: 'success', data: { records: data.records.rows } });
     });
   },
   postRecord: (req, res, next) => {
