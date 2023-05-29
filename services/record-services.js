@@ -21,7 +21,6 @@ const recordServices = {
       SportCategory.findAll({ raw: true }),
     ])
       .then(([records, sportCategories]) => {
-        console.log('record service records ==> ', records);
         return cb(null, {
           records,
           sportCategories,
