@@ -15,6 +15,7 @@ const recordServices = {
         order: [
           ['date', 'DESC'],
           ['id', 'DESC'],
+          [Image, 'id', 'ASC'],
         ],
       }),
       SportCategory.findAll({ raw: true }),
