@@ -1,4 +1,5 @@
 const { Record, SportCategory, User, Image } = require('../models');
+const { imgurMultipleFilesHandler, imgurDeleteImage } = require('../helpers/file-helpers');
 
 const recordServices = {
   getRecords: (req, cb) => {
@@ -34,6 +35,10 @@ const recordServices = {
     const userId = req.user.id;
     const { date, weight, waistline, description, sportCategoryId } = req.body;
     if (!date || !weight || !sportCategoryId) throw new Error('日期、體重和運動類型為必填欄位');
+
+    const { files } = req;
+
+    if (files.length === 0) throw new Error('請先上傳圖片');
 
     return User.findByPk(userId)
       .then((user) => {
@@ -76,11 +81,24 @@ const recordServices = {
               }),
             ])
               .then(([createRecord, updateUser]) => {
-                return Record.findByPk(createRecord.id, {
-                  include: [SportCategory, User, Image],
-                  nest: true,
-                  raw: true,
-                });
+                return imgurMultipleFilesHandler(files)
+                  .then((allImages) => {
+                    return allImages.map((image) => {
+                      return Image.create({
+                        recordId: createRecord.id,
+                        userId: updateUser.id,
+                        url: image.link,
+                        deleteHash: image.deletehash,
+                      });
+                    });
+                  })
+                  .then((images) => {
+                    return Record.findByPk(createRecord.id, {
+                      include: [SportCategory, User],
+                      nest: true,
+                      raw: true,
+                    });
+                  });
               })
               .then((record) => {
                 delete record.User.password;
@@ -241,7 +259,15 @@ const recordServices = {
       .then(([record, images]) => {
         if (!record) throw new Error('查無此紀錄');
 
-        return Promise.all([record.destroy(), images.map((image) => image.destroy())]);
+        return Promise.all([
+          record.destroy(),
+          images.map((image) => {
+            image.destroy();
+            if (image.deleteHash) {
+              imgurDeleteImage(image.deleteHash);
+            }
+          }),
+        ]);
       })
       .then(([deleteRecord, deleteImages]) => {
         // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
