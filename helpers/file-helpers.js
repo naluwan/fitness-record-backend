@@ -14,6 +14,30 @@ const imgurFileHandler = (file) => {
   });
 };
 
+const imgurMultipleFilesHandler = (files) => {
+  return new Promise((resolve, reject) => {
+    if (files.length === 0) return resolve(null);
+
+    // 由於上傳圖片僅需要path，所以需要將files檔案中的path拿出來再傳入uploadImages裡面
+    const currentFiles = files.map((file) => file.path);
+    return imgur
+      .uploadImages(currentFiles, 'File')
+      .then((images) => resolve(images))
+      .catch((err) => reject(err));
+  });
+};
+
+const imgurDeleteImage = (hash) => {
+  return new Promise((resolve, reject) => {
+    if (!hash) return resolve(null);
+
+    return imgur
+      .deleteImage(hash)
+      .then((status) => resolve(status))
+      .catch((err) => reject(err));
+  });
+};
+
 // const { ImgurClient } = require('imgur');
 
 // const imgurFileHandler = async (file) => {
@@ -35,4 +59,6 @@ const imgurFileHandler = (file) => {
 
 module.exports = {
   imgurFileHandler,
+  imgurMultipleFilesHandler,
+  imgurDeleteImage,
 };
