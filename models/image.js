@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: DataTypes.INTEGER,
       url: DataTypes.TEXT,
       deleteHash: DataTypes.STRING,
+      order: DataTypes.INTEGER,
     },
     {
       sequelize,
