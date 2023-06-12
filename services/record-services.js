@@ -16,7 +16,8 @@ const recordServices = {
         order: [
           ['date', 'DESC'],
           ['id', 'DESC'],
-          [Image, 'id', 'ASC'],
+          // 圖片按照使用者點選的順序上傳
+          [Image, 'order', 'ASC'],
         ],
       }),
       SportCategory.findAll({ raw: true }),
