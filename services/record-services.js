@@ -263,22 +263,22 @@ const recordServices = {
         return Promise.all([
           record.destroy(),
           images.map((image) => {
-            image.destroy();
             if (image.deleteHash) {
               imgurDeleteImage(image.deleteHash);
             }
+            return image.destroy();
           }),
         ]);
       })
       .then(([deleteRecord, deleteImages]) => {
         // 獲取該使用者所有的貼文並找出最後一篇貼文的日期
         let imagesArr = [];
-        deleteImages.forEach((image) =>
+        deleteImages.forEach((image) => {
           image.then((imageItem) => {
             const { recordId, userId, url } = imageItem;
             imagesArr.push({ recordId, userId, url });
-          }),
-        );
+          });
+        });
 
         return Record.findAll({ where: { userId: deleteRecord.userId } }).then((allRecords) => {
           // 驗證該使用者是否還有貼文
