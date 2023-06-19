@@ -7,7 +7,7 @@ const upload = require('../../middleware/multer');
 router.get('/:id/edit', authenticated, recordController.editRecord);
 router.put('/:id', authenticated, recordController.putRecord);
 router.delete('/:id', authenticated, recordController.deleteRecord);
-router.post('/', authenticated, upload.array('images'), recordController.postRecord);
+router.post('/', authenticated, upload.array('Images'), recordController.postRecord);
 router.get('/', recordController.getRecords);
 
 module.exports = router;
