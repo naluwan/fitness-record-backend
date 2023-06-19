@@ -1,5 +1,9 @@
 const { Record, SportCategory, User, Image } = require('../models');
-const { imgurMultipleFilesHandler, imgurDeleteImage } = require('../helpers/file-helpers');
+const {
+  imgurMultipleFilesHandler,
+  imgurDeleteImage,
+  imgurFileHandler,
+} = require('../helpers/file-helpers');
 
 const recordServices = {
   getRecords: (req, cb) => {
@@ -84,6 +88,36 @@ const recordServices = {
               }),
             ])
               .then(([createRecord, updateUser]) => {
+                // 改使用迴圈來上傳照片並添加order排序
+                return new Promise(async (resolve) => {
+                  for (let i = 0; i <= files.length; i += 1) {
+                    if (i === files.length) {
+                      return resolve();
+                    }
+                    await imgurFileHandler(files[i]).then((image) => {
+                      Image.create({
+                        recordId: createRecord.id,
+                        userId: updateUser.id,
+                        url: image.link,
+                        deleteHash: image.deletehash,
+                        order: i,
+                      });
+                    });
+                  }
+                }).then((images) => {
+                  return Record.findByPk(createRecord.id, {
+                    include: [SportCategory, User, Image],
+                    nest: true,
+                    raw: true,
+                  });
+                });
+              })
+              .then((record) => {
+                delete record.User.password;
+                return cb(null, { record });
+              });
+
+            /*
                 return imgurMultipleFilesHandler(files)
                   .then((allImages) => {
                     return allImages.map((image) => {
@@ -97,7 +131,7 @@ const recordServices = {
                   })
                   .then((images) => {
                     return Record.findByPk(createRecord.id, {
-                      include: [SportCategory, User],
+                      include: [SportCategory, User, Image],
                       nest: true,
                       raw: true,
                     });
@@ -107,6 +141,7 @@ const recordServices = {
                 delete record.User.password;
                 return cb(null, { record });
               });
+            // */
           } else {
             // 新記錄的日期小於最後一篇貼文的日期，代表是補之前的記錄，僅需要新增記錄不需要更新使用者資訊
             return Record.create({
