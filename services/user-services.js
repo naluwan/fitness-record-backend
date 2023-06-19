@@ -23,14 +23,14 @@ const userServices = {
         return bcrypt.hash(password, 10);
       })
       .then((hash) => {
-        return imgurFileHandler(file).then((filePath) => {
+        return imgurFileHandler(file).then((file) => {
           return User.create({
             name,
             email,
             weight,
             waistline,
             password: hash,
-            avatar: filePath || 'https://i.imgur.com/PGbAlS3.png',
+            avatar: file.link || 'https://i.imgur.com/PGbAlS3.png',
           });
         });
       })
