@@ -355,7 +355,8 @@ const recordServices = {
                   });
                 });
               })
-              .then(() => cb(null, { deleteRecord, images: imagesArr }));
+              .then(() => cb(null, { deleteRecord, images: imagesArr }))
+              .catch((err) => cb(err));
           }
           return User.findByPk(deleteRecord.userId)
             .then((user) => {
@@ -366,7 +367,8 @@ const recordServices = {
                 waistlineDiff: null,
               });
             })
-            .then(() => cb(null, { deleteRecord, images: imagesArr }));
+            .then(() => cb(null, { deleteRecord, images: imagesArr }))
+            .catch((err) => cb(err));
         });
       })
       .catch((err) => cb(err));
