@@ -27,8 +27,6 @@ const recordServices = {
       SportCategory.findAll({ raw: true }),
     ])
       .then(([records, sportCategories]) => {
-        console.log('services records ===> ', records);
-        console.log('services sportCategories ===> ', sportCategories);
         return cb(null, {
           records,
           sportCategories,
@@ -355,8 +353,7 @@ const recordServices = {
                   });
                 });
               })
-              .then(() => cb(null, { deleteRecord, images: imagesArr }))
-              .catch((err) => cb(err));
+              .then(() => cb(null, { deleteRecord, images: imagesArr }));
           }
           return User.findByPk(deleteRecord.userId)
             .then((user) => {
@@ -367,8 +364,7 @@ const recordServices = {
                 waistlineDiff: null,
               });
             })
-            .then(() => cb(null, { deleteRecord, images: imagesArr }))
-            .catch((err) => cb(err));
+            .then(() => cb(null, { deleteRecord, images: imagesArr }));
         });
       })
       .catch((err) => cb(err));
