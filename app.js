@@ -18,7 +18,7 @@ app.use(
     credentials: true,
     preflightContinue: false,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    origin: process.env.WHITELIST,
+    origin: '*',
   }),
 );
 app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
