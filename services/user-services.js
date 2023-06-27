@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 const { imgurFileHandler } = require('../helpers/file-helpers');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 const userServices = {
   signUp: (req, cb) => {
@@ -17,9 +18,10 @@ const userServices = {
 
     const { file } = req;
 
-    return User.findOne({ where: { email } })
+    return User.findOne({ where: { [Op.or]: [{ email: email }, { name: name }] } })
       .then((user) => {
-        if (user) throw new Error('此帳號已註冊過');
+        if (user.email === email) throw new Error('此帳號已註冊過');
+        if (user.name.toLowerCase() === name.toLowerCase()) throw new Error('使用者名稱重複');
         return bcrypt.hash(password, 10);
       })
       .then((hash) => {
