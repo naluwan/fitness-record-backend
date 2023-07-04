@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User } = require('../models');
+const { User, Record, Image } = require('../models');
 const { imgurFileHandler } = require('../helpers/file-helpers');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
@@ -67,6 +67,25 @@ const userServices = {
         .then((user) => cb(null, { user, idToken: id_token }))
         .catch((err) => cb(err));
     });
+  },
+  getUser: (req, cb) => {
+    const { userId } = req.params;
+    return Promise.all([
+      User.findByPk(userId),
+      Record.findAll({
+        where: { userId },
+        include: [Image],
+        order: [
+          ['id', 'DESC'],
+          [Image, 'order', 'ASC'],
+        ],
+      }),
+    ])
+      .then(([user, records]) => {
+        if (!user) throw new Error('查無該使用者');
+        return cb(null, { user, records });
+      })
+      .catch((err) => cb(err));
   },
 };
 

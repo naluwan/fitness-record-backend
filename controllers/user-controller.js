@@ -44,6 +44,12 @@ const userController = {
     const user = req.user;
     res.json({ status: 'success', data: { user } });
   },
+  getUser: (req, res, next) => {
+    userServices.getUser(req, (err, data) => {
+      delete data.user.dataValues.password;
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
 };
 
 module.exports = userController;
