@@ -28,6 +28,7 @@ router.get('/login/line', passport.authenticate('line', { scope: ['email', 'prof
 
 router.post('/login/line/return', userController.lineLogin);
 
+router.get('/getUser/:userId', userController.getUser);
 router.post('/signup', upload.single('avatar'), userController.signUp);
 router.get('/auth', authenticated, userController.auth);
 
