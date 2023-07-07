@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User, Record, Image } = require('../models');
+const { User, Record, Image, SportCategory } = require('../models');
 const { imgurFileHandler } = require('../helpers/file-helpers');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
@@ -74,7 +74,7 @@ const userServices = {
       User.findByPk(userId),
       Record.findAll({
         where: { userId },
-        include: [Image],
+        include: [Image, SportCategory],
         order: [
           ['id', 'DESC'],
           [Image, 'order', 'ASC'],
