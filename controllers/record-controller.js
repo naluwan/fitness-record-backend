@@ -9,7 +9,7 @@ const recordController = {
         delete r.User.dataValues.password;
         r.dataValues.date = dateFormat(r.dataValues.date);
       });
-      err ? next(err) : res.json({ status: 'success', data: { records: data.records.rows } });
+      err ? next(err) : res.json({ status: 'success', data });
     });
   },
   postRecord: (req, res, next) => {
