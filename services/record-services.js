@@ -4,11 +4,16 @@ const {
   imgurDeleteImage,
   imgurFileHandler,
 } = require('../helpers/file-helpers');
+const { getOffset, getPagination } = require('../helpers/pagination-helper');
 
 const recordServices = {
   getRecords: (req, cb) => {
+    const DEFAULT_LIMIT = 5;
     const userId = Number(req.query.userId) || '';
     const sportCategoryId = Number(req.query.sportCategoryId) || '';
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT;
+    const offset = getOffset(limit, page);
 
     return Promise.all([
       Record.findAndCountAll({
@@ -23,6 +28,8 @@ const recordServices = {
           // 圖片按照使用者點選的順序上傳
           [Image, 'order', 'ASC'],
         ],
+        limit,
+        offset,
       }),
       SportCategory.findAll({ raw: true }),
     ])
@@ -32,6 +39,7 @@ const recordServices = {
           sportCategories,
           sportCategoryId,
           userId,
+          pagination: getPagination(limit, page, records.count),
         });
       })
       .catch((err) => cb(err));
