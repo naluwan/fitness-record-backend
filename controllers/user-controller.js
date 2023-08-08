@@ -50,6 +50,12 @@ const userController = {
       err ? next(err) : res.json({ status: 'success', data });
     });
   },
+  getUsers: (req, res, next) => {
+    userServices.getUsers(req, (err, data) => {
+      const users = data.map((user) => delete user.password);
+      err ? next(err) : res.json({ status: 'success', data });
+    });
+  },
 };
 
 module.exports = userController;

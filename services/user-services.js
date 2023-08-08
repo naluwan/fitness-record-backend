@@ -87,6 +87,12 @@ const userServices = {
       })
       .catch((err) => cb(err));
   },
+  getUsers: (req, cb) => {
+    return User.findAll({ raw: true, nest: true }).then((users) => {
+      if (!users) throw new Error('查無使用者資料');
+      return cb(null, users);
+    });
+  },
 };
 
 module.exports = userServices;
