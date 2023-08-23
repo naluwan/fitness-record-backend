@@ -7,7 +7,6 @@ const { Op } = require('sequelize');
 const userServices = {
   signUp: (req, cb) => {
     const { name, email, password, passwordCheck, weight, waistline } = req.body;
-
     if (!name || !email || !password || !passwordCheck) {
       throw new Error('所有欄位都是必填的');
     }
@@ -20,19 +19,21 @@ const userServices = {
 
     return User.findOne({ where: { [Op.or]: [{ email: email }, { name: name }] } })
       .then((user) => {
-        if (user.email === email) throw new Error('此帳號已註冊過');
-        if (user.name.toLowerCase() === name.toLowerCase()) throw new Error('使用者名稱重複');
+        if (user) {
+          if (user.email === email) throw new Error('此帳號已註冊過');
+          if (user.name.toLowerCase() === name.toLowerCase()) throw new Error('使用者名稱重複');
+        }
         return bcrypt.hash(password, 10);
       })
       .then((hash) => {
-        return imgurFileHandler(file).then((file) => {
+        return imgurFileHandler(file).then((img) => {
           return User.create({
             name,
             email,
             weight,
             waistline,
             password: hash,
-            avatar: file.link || 'https://i.imgur.com/PGbAlS3.png',
+            avatar: img?.link || 'https://i.imgur.com/PGbAlS3.png',
           });
         });
       })
